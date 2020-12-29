@@ -15,6 +15,16 @@ app.get('/api/quotes/random', (req, res, next) => {
   res.send(randomQuote);
 });
 
+app.get('/api/quotes', (req, res, next) => {
+  const person = req.query.person;
+  if (person) {
+    const filteredQuotes = quotes.filter(val => val.person === person);
+    res.send({ quotes: filteredQuotes });
+  } else {
+    res.send({ quotes });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
