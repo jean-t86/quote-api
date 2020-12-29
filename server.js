@@ -25,6 +25,17 @@ app.get('/api/quotes', (req, res, next) => {
   }
 });
 
+app.post('/api/quotes', (req, res, next) => {
+  const quote = req.query.quote;
+  const person = req.query.person;
+  if (quote && person) {
+    quotes.push({quote, person});
+    res.send({quote: {quote, person}});
+  } else {
+    res.status(400).send();
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
