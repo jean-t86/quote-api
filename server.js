@@ -36,6 +36,23 @@ app.post('/api/quotes', (req, res, next) => {
   }
 });
 
+app.put('/api/quotes/:id', (req, res, next) => {
+  const id = Number(req.params.id);
+  const quote = req.query.quote;
+  const person = req.query.person;
+  if (!id || !quote || !person) res.status(400).send();
+
+  const index = getIndexById(quotes, id);
+  if (index === -1) res.status(404).send();
+
+  const newQuote = {
+    quote,
+    person
+  };
+  quotes[index] = newQuote;
+  res.send({ quote: newQuote });
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
