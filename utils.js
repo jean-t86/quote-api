@@ -5,7 +5,10 @@ const getRandomElement = arr => {
 
 const getElementById = (arr, id) => arr.find(val => val.id === id)
 
+const getIndexById = (arr, id) => arr.findIndex(val => val.id === id)
+
 module.exports = {
   getRandomElement,
-  getElementById
+  getElementById,
+  getIndexById
 };
