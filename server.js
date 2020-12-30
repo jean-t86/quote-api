@@ -53,6 +53,23 @@ app.put('/api/quotes/:id', (req, res, next) => {
   res.send({ quote: newQuote });
 });
 
+app.delete('/api/quotes/:id', (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!id) {
+    res.status(400).send();
+    return;
+  }
+
+  const index = getIndexById(quotes, id);
+  if (index === -1) {
+    res.status(404).send();
+    return;
+  }
+
+  quotes.splice(index, 1);
+  res.status(204).send();
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
