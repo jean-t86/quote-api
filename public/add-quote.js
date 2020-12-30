@@ -1,6 +1,12 @@
 const submitButton = document.getElementById('submit-quote');
 const newQuoteContainer = document.getElementById('new-quote');
 
+const renderError = response => {
+  newQuoteContainer.innerHTML = `<p>Your request returned an error from the server: </p>
+<p>Code: ${response.status}</p>
+<p>${response.statusText}</p>`;
+}
+
 submitButton.addEventListener('click', () => {
   const quote = document.getElementById('quote').value;
   const person = document.getElementById('person').value;
@@ -8,7 +14,13 @@ submitButton.addEventListener('click', () => {
   fetch(`/api/quotes?quote=${quote}&person=${person}`, {
     method: 'POST',
   })
-  .then(response => response.json())
+  .then(response => {
+    if (response.ok) {
+      return response.json()
+    } else {
+      renderError(response);
+    }
+  })
   .then(({quote}) => {
     const newQuote = document.createElement('div');
     newQuote.innerHTML = `
