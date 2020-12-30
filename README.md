@@ -4,6 +4,7 @@
 * [Project Description](#project-description)
 * [Technologies](#technologies)
 * [Setup](#setup)
+* [Running the app](#running-the-app)
 
 ## General Information
 This is a practice lab from the [Back-end Engineer path on Codecademy](https://www.codecademy.com/learn/paths/back-end-engineer-career-path). The course teaches all the major technologies and skills that a back-end engineer needs to know.
@@ -26,3 +27,8 @@ In order to run the program, you need to install Node.js on your computer:
 Once installed, install the program's dependencies with `node i` in your terminal with the project's folder as working directory.
 
 You can then start the Express server by typing `node server.js`.
+
+## Running the app
+Once you have the server up and running, you can launch the app in your browser by vising the URL `http://localhost:4001/`
+
+The frontend contains actions for accessing all of the exposed endpoints from the backend server.
