@@ -46,6 +46,7 @@ app.put('/api/quotes/:id', (req, res, next) => {
   if (index === -1) res.status(404).send();
 
   const newQuote = {
+    id,
     quote,
     person
   };
