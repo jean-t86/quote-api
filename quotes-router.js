@@ -22,50 +22,58 @@ quotesRouter.get('/', (req, res, next) => {
   }
 });
 
-quotesRouter.post('/', (req, res, next) => {
+const validateQuote = (req, res, next) => {
   const quote = req.query.quote;
   const person = req.query.person;
+
   if (quote && person) {
-    const id = getNewId(quotes);
-    quotes.push({id, quote, person});
-    res.send({quote: {id, quote, person}});
+    req.quote = quote;
+    req.person = person;
+    next();
+  } else {
+    res.status(400).send();
+  }
+};
+
+quotesRouter.post('/', validateQuote, (req, res, next) => {
+  const id = getNewId(quotes);
+  const quote = {
+    id,
+    quote: req.quote,
+    person: req.person,
+  };
+  quotes.push(quote);
+  res.send({quote});
+});
+
+quotesRouter.param('id', (req, res, next, id) => {
+  const quoteId = Number(id);
+  if (quoteId) {
+    const quoteIndex = getIndexById(quotes, quoteId);
+    if (quoteIndex !== -1) {
+      req.id = quoteId;
+      req.quoteIndex = quoteIndex;
+      next();
+    } else {
+      res.send(404).send();
+    }
   } else {
     res.status(400).send();
   }
 });
 
-quotesRouter.put('/:id', (req, res, next) => {
-  const id = Number(req.params.id);
-  const quote = req.query.quote;
-  const person = req.query.person;
-  if (!id || !quote || !person) res.status(400).send();
-
-  const index = getIndexById(quotes, id);
-  if (index === -1) res.status(404).send();
-
-  const newQuote = {
-    id,
-    quote,
-    person,
+quotesRouter.put('/:id', validateQuote, (req, res, next) => {
+  const quote = {
+    id: req.id,
+    quote: req.quote,
+    person: req.person,
   };
-  quotes[index] = newQuote;
-  res.send({quote: newQuote});
+  quotes[req.quoteIndex] = quote;
+  res.send({quote});
 });
 
 quotesRouter.delete('/:id', (req, res, next) => {
-  const id = Number(req.params.id);
-  if (!id) {
-    res.status(400).send();
-    return;
-  }
-
-  const index = getIndexById(quotes, id);
-  if (index === -1) {
-    res.status(404).send();
-    return;
-  }
-
-  quotes.splice(index, 1);
+  quotes.splice(req.quoteIndex, 1);
   res.status(204).send();
 });
 
