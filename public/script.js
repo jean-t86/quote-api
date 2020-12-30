@@ -22,7 +22,8 @@ const renderQuotes = (quotes = []) => {
     quotes.forEach(quote => {
       const newQuote = document.createElement('div');
       newQuote.className = 'single-quote';
-      newQuote.innerHTML = `<div class="quote-text">${quote.quote}</div>
+      newQuote.innerHTML = `<div class="quote-id">${quote.id}</div>
+      <div class="quote-text">${quote.quote}</div>
       <div class="attribution">- ${quote.person}</div>`;
       quoteContainer.appendChild(newQuote);
     });
