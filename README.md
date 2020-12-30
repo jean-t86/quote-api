@@ -24,7 +24,7 @@ In order to run the program, you need to install Node.js on your computer:
 * [Download](https://nodejs.org/en/download/) the binaries
 * If you use Linux, follow the [installation instructions](https://github.com/nodejs/help/wiki/Installation#how-to-install-nodejs-via-binary-archive-on-linux).
 
-Once installed, install the program's dependencies with `node i` in your terminal with the project's folder as working directory.
+Once installed, install the program's dependencies with `npm install` in your terminal with the project's folder as working directory.
 
 You can then start the Express server by typing `node server.js`.
 
