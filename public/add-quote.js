@@ -25,6 +25,7 @@ submitButton.addEventListener('click', () => {
     const newQuote = document.createElement('div');
     newQuote.innerHTML = `
     <h3>Congrats, your quote was added!</h3>
+    <div class="quote-id">${quote.id}</div>
     <div class="quote-text">${quote.quote}</div>
     <div class="attribution">- ${quote.person}</div>
     <p>Go to the <a href="index.html">home page</a> to request and view all quotes.</p>

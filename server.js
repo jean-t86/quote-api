@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 const { quotes } = require('./data');
-const { getRandomElement, getElementById, getIndexById } = require('./utils');
+const { getRandomElement, getElementById, getIndexById, getNewId } = require('./utils');
 
 const PORT = process.env.PORT || 4001;
 
@@ -29,8 +29,9 @@ app.post('/api/quotes', (req, res, next) => {
   const quote = req.query.quote;
   const person = req.query.person;
   if (quote && person) {
-    quotes.push({quote, person});
-    res.send({quote: {quote, person}});
+    const id = getNewId(quotes);
+    quotes.push({id, quote, person});
+    res.send({quote: {id, quote, person}});
   } else {
     res.status(400).send();
   }
