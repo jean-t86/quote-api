@@ -118,7 +118,16 @@ class Server {
       res.status(200).send(req.quote);
     });
 
-    server.app.put('/api/quotes/:quoteId', (req, res) => {
+    const validateQuote = (req, res, next) => {
+      const quote = req.body.quote;
+      if (quote.id && quote.quote && quote.person) {
+        next();
+      } else {
+        res.status(400).send();
+      }
+    };
+
+    server.app.put('/api/quotes/:quoteId', validateQuote, (req, res) => {
       const quote = {
         id: req.quoteId,
         quote: req.body.quote.quote,

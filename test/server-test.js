@@ -306,6 +306,19 @@ describe('Server', function() {
             .put(`/api/quotes/${id}`)
             .expect(400, done);
       });
+
+      it('returns 400 if put with an invalid quote', function(done) {
+        request(server.app)
+            .put('/api/quotes/1')
+            .send({
+              quote: {
+                id: 1,
+                quote: '',
+                person: '',
+              },
+            })
+            .expect(400, done);
+      });
     });
   });
 });
