@@ -122,6 +122,7 @@ describe('Server', function() {
     it('executes calls to the server object in the right order', function() {
       const spyServeStaticFiles = sinon.spy(server, 'serveStaticFiles');
       const spySetupMorgan = sinon.spy(server, 'setupMorgan');
+      const spySetupBodyParser = sinon.spy(server, 'setupBodyParser');
       const spyListen = sinon.spy(server, 'listen');
       const port = 4001;
 
@@ -133,7 +134,10 @@ describe('Server', function() {
       assert.ok(spySetupMorgan.calledAfter(spyServeStaticFiles));
       assert.strictEqual('combined', spySetupMorgan.getCall(0).args[0]);
 
-      assert.ok(spyListen.calledAfter(spySetupMorgan));
+      assert.ok(spySetupBodyParser.calledAfter(spySetupMorgan));
+      assert.deepEqual(bodyParser.json, spySetupBodyParser.getCall(0).args[0]);
+
+      assert.ok(spyListen.calledAfter(spySetupBodyParser));
       assert.strictEqual(port, spyListen.getCall(0).args[0]);
       assert.strictEqual(
           `Server listening on port ${port}`,
