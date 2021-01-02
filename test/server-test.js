@@ -14,6 +14,7 @@ describe('Server', function() {
 
   afterEach(function() {
     sinon.restore();
+    server.close();
   });
 
   describe('Initialize app in constructor', function() {
@@ -27,7 +28,7 @@ describe('Server', function() {
 
   describe('Serves static pages', function() {
     it('calls app.use to setup the static middleware', function() {
-      const appMock = sinon.mock(server._app);
+      const appMock = sinon.mock(server.app);
       appMock.expects('use').once();
 
       server.serveStaticFiles('public');
@@ -48,10 +49,10 @@ describe('Server', function() {
 
   describe('Uses morgan as console logger', function() {
     it('calls app.use to setup the morgan logger', function() {
-      const appMock = sinon.mock(server._app);
+      const appMock = sinon.mock(server.app);
       appMock.expects('use').once();
 
-      server.setupMorgan();
+      server.setupMorgan('combined');
 
       appMock.verify();
     });
@@ -70,7 +71,7 @@ describe('Server', function() {
 
   describe('Listens on the correct port', function() {
     it('calls listen() with the correct port', function() {
-      const appSpy = sinon.spy(server._app, 'listen');
+      const appSpy = sinon.spy(server.app, 'listen');
       const port = 4001;
 
       const httpServer = server.listen(port, 'asda');
@@ -106,6 +107,22 @@ describe('Server', function() {
       assert.ok(serveStaticFiles.calledOnce);
       assert.ok(setupMorgan.calledAfter(serveStaticFiles));
       assert.ok(listen.calledAfter(setupMorgan));
+    });
+  });
+
+  describe('Closes the server connection', function() {
+    it('close() returns false if server is not listening', function() {
+      const isClosed = server.close();
+
+      assert.ok(!isClosed);
+    });
+
+    it('closes() returns true if the server was listening', function() {
+      server.listen(4001, '');
+
+      const isClosed = server.close();
+
+      assert.ok(isClosed);
     });
   });
 });

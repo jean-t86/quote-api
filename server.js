@@ -16,6 +16,13 @@ class Server {
   }
 
   /**
+   * Getter method for this._app
+   */
+  get app() {
+    return this._app;
+  }
+
+  /**
    * Instructs the Server to serve static files
    * @param {String} root The root path from which to serve static files
    */
@@ -38,9 +45,24 @@ class Server {
    * @return {http.Server} The http server that was created
    */
   listen(port, logMsg) {
-    return this._app.listen(port, () => {
+    this._httpServer = this._app.listen(port, () => {
       this._console.log(logMsg);
     });
+    return this._httpServer;
+  }
+
+  /**
+   * Closes the server's connection
+   * @return {boolean} true if the http server was succesfully closed, false
+   * otherwise
+   */
+  close() {
+    if (this._httpServer !== undefined) {
+      this._httpServer.close();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
