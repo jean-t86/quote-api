@@ -1,10 +1,16 @@
 # Quote API
 ## Table of contents
+* [Test Driven Development](#test-driven-development)
 * [General information](#general-information)
 * [Project Description](#project-description)
 * [Technologies](#technologies)
 * [Setup](#setup)
 * [Running the app](#running-the-app)
+
+## Test Driven Development
+This branch sole purpose is to rebuild the Quote API using test driven development for the server side only. 
+
+I used the codebase with the completed project and as first commit, removed all the server code for a fresh start.
 
 ## General Information
 This is a practice lab from the [Back-end Engineer path on Codecademy](https://www.codecademy.com/learn/paths/back-end-engineer-career-path). The course teaches all the major technologies and skills that a back-end engineer needs to know.
