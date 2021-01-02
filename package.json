@@ -1,0 +1,23 @@
+{
+  "name": "quote-api",
+  "version": "1.0.0",
+  "description": "* [Test Driven Development](#test-driven-development) * [General information](#general-information) * [Project Description](#project-description) * [Technologies](#technologies) * [Setup](#setup) * [Running the app](#running-the-app)",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jean-t86/quote-api.git"
+  },
+  "author": "J.Tadebois",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jean-t86/quote-api/issues"
+  },
+  "homepage": "https://github.com/jean-t86/quote-api#readme"
+}
