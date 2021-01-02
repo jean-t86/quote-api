@@ -111,6 +111,25 @@ class Server {
         res.status(400).send();
       }
     });
+
+    server.app.put('/api/quotes/:quoteId', (req, res) => {
+      const id = Number(req.params.quoteId);
+      if (id) {
+        const quote = getElementById(quotes, id);
+        if (quote) {
+          quote.quote = req.body.quote.quote;
+          quote.person = req.body.quote.person;
+          const index = getIndexById(quotes, id);
+          quotes[index] = quote;
+          res.status(200).send();
+        } else {
+          res.status(404).send();
+        }
+      } else {
+        res.status(400).send();
+      }
+    });
+
     server.listen(port, `Server listening on port ${port}`);
   }
 }

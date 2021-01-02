@@ -158,7 +158,7 @@ describe('Server', function() {
     });
   });
 
-  describe('GET random quote', function() {
+  describe('Quote API', function() {
     beforeEach(function() {
       Server.run(server, 4001);
     });
@@ -242,6 +242,64 @@ describe('Server', function() {
         const id = 'string';
         request(server.app)
             .get(`/api/quotes/${id}`)
+            .expect(400, done);
+      });
+    });
+
+    describe('Put to update an existing quote', function() {
+      it('returns status code 200', function(done) {
+        request(server.app)
+            .put('/api/quotes/1')
+            .send({
+              quote: {
+                id: 1,
+                quote: 'Update this quote',
+                person: 'Me',
+              },
+            })
+            .expect(200, done);
+      });
+
+      it('updates an existing quote', async function() {
+        // Get a random quote and update it
+        const response = await request(server.app)
+            .get('/api/quotes/random');
+        const id = response.body.quote.id;
+        const quote = {
+          id,
+          quote: 'A new quote',
+          person: 'me',
+        };
+
+        // Call put to update the quote on the server
+        await request(server.app)
+            .put(`/api/quotes/${id}`)
+            .send({quote})
+            .expect(200);
+
+        // Checks that the quote has been updated on the server
+        await request(server.app)
+            .get(`/api/quotes/${id}`)
+            .expect(200)
+            .then((res) => {
+              const updatedQuote = res.body.quote;
+              assert.strictEqual(quote.id, updatedQuote.id);
+              assert.strictEqual(quote.quote, updatedQuote.quote);
+              assert.strictEqual(quote.person, updatedQuote.person);
+            });
+      });
+
+      it('returns 404 when the id is not found', function(done) {
+        const id = 30;
+        request(server.app)
+            .put(`/api/quotes/${id}`)
+            .expect(404, done);
+      });
+
+      it('returns 400 when the id is not a number', function(done) {
+        const id = 'string';
+        request(server.app)
+            .put(`/api/quotes/${id}`)
             .expect(400, done);
       });
     });
