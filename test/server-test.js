@@ -101,12 +101,22 @@ describe('Server', function() {
       const serveStaticFiles = sinon.spy(server, 'serveStaticFiles');
       const setupMorgan = sinon.spy(server, 'setupMorgan');
       const listen = sinon.spy(server, 'listen');
+      const port = 4001;
 
-      Server.run(server, 4001);
+      Server.run(server, port);
 
       assert.ok(serveStaticFiles.calledOnce);
+      assert.strictEqual('public', serveStaticFiles.getCall(0).args[0]);
+
       assert.ok(setupMorgan.calledAfter(serveStaticFiles));
+      assert.strictEqual('combined', setupMorgan.getCall(0).args[0]);
+
       assert.ok(listen.calledAfter(setupMorgan));
+      assert.strictEqual(port, listen.getCall(0).args[0]);
+      assert.strictEqual(
+          `Server listening on port ${port}`,
+          listen.getCall(0).args[1],
+      );
     });
   });
 
@@ -117,7 +127,7 @@ describe('Server', function() {
       assert.ok(!isClosed);
     });
 
-    it('closes() returns true if the server was listening', function() {
+    it('close() returns true if the server was listening', function() {
       server.listen(4001, '');
 
       const isClosed = server.close();
