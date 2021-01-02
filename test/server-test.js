@@ -14,8 +14,8 @@ describe('Server', function() {
     sinon.restore();
   });
 
-  describe('Initialize app', function() {
-    it('Initialises the express app by calling express()', function() {
+  describe('Initialize app in constructor', function() {
+    it('initialises the express app by calling express()', function() {
       const expressSpy = sinon.spy();
       server = new Server(expressSpy);
 
@@ -41,6 +41,17 @@ describe('Server', function() {
 
       assert.ok(expressSpy.calledOnce);
       assert.strictEqual(root, expressSpy.getCall(0).args[0]);
+    });
+  });
+
+  describe('Uses morgan as console logger', function() {
+    it('calls app.use to setup the morgan logger', function() {
+      const appMock = sinon.mock(server._app);
+      appMock.expects('use').once();
+
+      server.setupMorgan();
+
+      appMock.verify();
     });
   });
 });
