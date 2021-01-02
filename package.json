@@ -21,8 +21,9 @@
   },
   "homepage": "https://github.com/jean-t86/quote-api#readme",
   "devDependencies": {
+    "chai": "*",
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
-    "mocha": "^8.2.1"
+    "mocha": "*"
   }
 }
