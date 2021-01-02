@@ -1,12 +1,12 @@
 const {assert} = require('chai');
 const sinon = require('sinon');
+const express = require('express');
+const Server = require('../server.js');
 
 describe('Server', function() {
-  let express;
   let server;
 
   beforeEach(function() {
-    express = require('express');
     server = new Server(express);
   });
 
@@ -16,11 +16,12 @@ describe('Server', function() {
 
   describe('Initialize app', function() {
     it('Initialises the express app by calling express()', function() {
-      sinon.spy(express);
+      const expressSpy = sinon.spy();
+      server = new Server(expressSpy);
 
       server.initialize();
 
-      assert.ok(express.calledOnce);
+      assert.ok(expressSpy.calledOnce);
     });
   });
 });
