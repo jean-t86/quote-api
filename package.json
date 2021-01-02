@@ -25,6 +25,7 @@
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "*",
+    "sinon": "^9.2.2",
     "supertest": "^6.0.1"
   }
 }
