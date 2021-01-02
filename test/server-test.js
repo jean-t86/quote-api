@@ -1,6 +1,7 @@
 const {assert} = require('chai');
 const sinon = require('sinon');
 const express = require('express');
+const morgan = require('morgan');
 const Server = require('../server.js');
 
 describe('Server', function() {
@@ -52,6 +53,16 @@ describe('Server', function() {
       server.setupMorgan();
 
       appMock.verify();
+    });
+
+    it('correctly sets up the morgan logger', function() {
+      const morganSpy = sinon.spy(morgan);
+      const morganFormat = 'combined';
+
+      server.setupMorgan(morganFormat);
+
+      assert.ok(morganSpy.calledOnce);
+      assert.strictEqual(morganFormat, morganSpy.getCall(0).args[0]);
     });
   });
 });
