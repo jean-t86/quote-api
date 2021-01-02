@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/jean-t86/quote-api/issues"
   },
-  "homepage": "https://github.com/jean-t86/quote-api#readme"
+  "homepage": "https://github.com/jean-t86/quote-api#readme",
+  "devDependencies": {
+    "eslint": "^7.17.0",
+    "eslint-config-google": "^0.14.0"
+  }
 }
