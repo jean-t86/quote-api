@@ -18,6 +18,13 @@ class Server {
   serveStaticFiles(root) {
     this._app.use(this._express.static(root));
   }
+
+  /**
+   * Setup the morgan logger to be used by the Server
+   */
+  setupMorgan() {
+    this._app.use();
+  }
 }
 
 
