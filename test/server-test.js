@@ -70,13 +70,13 @@ describe('Server', function() {
 
   describe('Listens on the correct port', function() {
     it('calls listen() with the correct port', function() {
-      const appMock = sinon.mock(server._app);
+      const appSpy = sinon.spy(server._app, 'listen');
       const port = 4001;
-      appMock.expects('listen').once().withArgs(port);
 
-      server.listen(port, '');
-
-      appMock.verify();
+      const httpServer = server.listen(port, 'asda');
+      assert.ok(appSpy.calledOnce);
+      assert.strictEqual(port, appSpy.getCall(0).args[0]);
+      httpServer.close();
     });
 
     it('logs a message to the console once listen() is called', function(done) {
@@ -89,8 +89,23 @@ describe('Server', function() {
       httpServer.on('listening', () => {
         assert.ok(consoleSpy.calledOnce);
         assert.strictEqual(consoleMsg, consoleSpy.getCall(0).args[0]);
+        httpServer.close();
         done();
       });
+    });
+  });
+
+  describe('Runs the server', function() {
+    it('executes calls to the server object in the right order', function() {
+      const serveStaticFiles = sinon.spy(server, 'serveStaticFiles');
+      const setupMorgan = sinon.spy(server, 'setupMorgan');
+      const listen = sinon.spy(server, 'listen');
+
+      Server.run(server, 4001);
+
+      assert.ok(serveStaticFiles.calledOnce);
+      assert.ok(setupMorgan.calledAfter(serveStaticFiles));
+      assert.ok(listen.calledAfter(setupMorgan));
     });
   });
 });

@@ -1,6 +1,3 @@
-const express = require('express');
-const morgan = require('morgan');
-
 /**
  * The Server class used to encapsulate the node.js web server
  */
@@ -44,6 +41,17 @@ class Server {
     return this._app.listen(port, () => {
       this._console.log(logMsg);
     });
+  }
+
+  /**
+   * Runs the server
+   * @param {Server} server The server to run
+   * @param {number} port The port to which the server should listen to
+   */
+  static run(server, port) {
+    server.serveStaticFiles('public');
+    server.setupMorgan('combined');
+    server.listen(port, `Server listening on port ${port}`);
   }
 }
 
