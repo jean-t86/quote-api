@@ -8,13 +8,7 @@ class Server {
    */
   constructor(express) {
     this._express = express;
-  }
-
-  /**
-   * Initializes the web server
-   */
-  initialize() {
-    this._app = this._express();
+    this._app = express();
   }
 
   /**

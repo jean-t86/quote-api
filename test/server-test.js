@@ -19,16 +19,12 @@ describe('Server', function() {
       const expressSpy = sinon.spy();
       server = new Server(expressSpy);
 
-      server.initialize();
-
       assert.ok(expressSpy.calledOnce);
     });
   });
 
   describe('Serves static pages', function() {
     it('calls app.use to setup the static middleware', function() {
-      server.initialize();
-
       const appMock = sinon.mock(server._app);
       appMock.expects('use').once();
 
@@ -38,7 +34,6 @@ describe('Server', function() {
     });
 
     it('calls app.use with the correct middleware function', function() {
-      server.initialize();
       const root = 'public';
       const expressSpy = sinon.spy(express, 'static');
 
