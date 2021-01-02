@@ -5,9 +5,11 @@ class Server {
   /**
    * Constructor for the Server class
    * @param {express} express The express web framework
+   * @param {morgan} morgan The morgan logger middleware
    */
-  constructor(express) {
+  constructor(express, morgan) {
     this._express = express;
+    this._morgan = morgan;
     this._app = express();
   }
 
@@ -21,11 +23,11 @@ class Server {
 
   /**
    * Setup the morgan logger to be used by the Server
+   * @param {string} format The format to use by the morgan logger
    */
-  setupMorgan() {
-    this._app.use();
+  setupMorgan(format) {
+    this._app.use(this._morgan(format));
   }
 }
-
 
 module.exports = Server;

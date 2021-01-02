@@ -8,7 +8,7 @@ describe('Server', function() {
   let server;
 
   beforeEach(function() {
-    server = new Server(express);
+    server = new Server(express, morgan);
   });
 
   afterEach(function() {
@@ -57,12 +57,13 @@ describe('Server', function() {
 
     it('correctly sets up the morgan logger', function() {
       const morganSpy = sinon.spy(morgan);
-      const morganFormat = 'combined';
+      server = new Server(express, morganSpy);
+      const format = 'combined';
 
-      server.setupMorgan(morganFormat);
+      server.setupMorgan(format);
 
       assert.ok(morganSpy.calledOnce);
-      assert.strictEqual(morganFormat, morganSpy.getCall(0).args[0]);
+      assert.strictEqual(format, morganSpy.getCall(0).args[0]);
     });
   });
 });
