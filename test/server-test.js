@@ -2,6 +2,7 @@ const {assert} = require('chai');
 const sinon = require('sinon');
 const express = require('express');
 const morgan = require('morgan');
+const request = require('supertest');
 
 const Server = require('../server.js');
 
@@ -133,6 +134,36 @@ describe('Server', function() {
       const isClosed = server.close();
 
       assert.ok(isClosed);
+    });
+  });
+
+  describe('GET random quote', function() {
+    beforeEach(function() {
+      Server.run(server, 4001);
+    });
+
+    afterEach(function(done) {
+      server.close(done);
+    });
+
+    it('returns status code 200', function(done) {
+      request(server.app)
+          .get('/api/quotes/random')
+          .expect(200, done);
+    });
+
+    it('returns a random quote', function(done) {
+      request(server.app)
+          .get('/api/quotes/random')
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+            const quote = res.body.quote;
+            assert.ok(quote.id !== undefined);
+            assert.ok(quote.quote !== undefined);
+            assert.ok(quote.person !== undefined);
+            done();
+          });
     });
   });
 });

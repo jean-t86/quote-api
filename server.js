@@ -1,3 +1,6 @@
+const {quotes} = require('./data.js');
+const {getRandomElement} = require('./utils.js');
+
 /**
  * The Server class used to encapsulate the node.js web server
  */
@@ -53,12 +56,13 @@ class Server {
 
   /**
    * Closes the server's connection
+   * @param {CallbackHandler} done The async callback required when unit testing
    * @return {boolean} true if the http server was succesfully closed, false
    * otherwise
    */
-  close() {
+  close(done) {
     if (this._httpServer !== undefined) {
-      this._httpServer.close();
+      this._httpServer.close(done);
       return true;
     } else {
       return false;
@@ -73,6 +77,12 @@ class Server {
   static run(server, port) {
     server.serveStaticFiles('public');
     server.setupMorgan('combined');
+
+    server.app.get('/api/quotes/random', (req, res) => {
+      const quote = getRandomElement(quotes);
+      res.status(200).send({quote});
+    });
+
     server.listen(port, `Server listening on port ${port}`);
   }
 }
