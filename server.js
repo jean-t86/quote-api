@@ -19,10 +19,12 @@ class Server {
 
   /**
    * Instructs the Server to serve static files
+   * @param {String} root The root path from which to serve static files
    */
-  serveStaticFiles() {
-    this._app.use();
+  serveStaticFiles(root) {
+    this._app.use(this._express.static(root));
   }
 }
+
 
 module.exports = Server;

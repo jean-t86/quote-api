@@ -32,7 +32,7 @@ describe('Server', function() {
       const appMock = sinon.mock(server._app);
       appMock.expects('use').once();
 
-      server.serveStaticFiles();
+      server.serveStaticFiles('public');
 
       appMock.verify();
     });
@@ -42,7 +42,7 @@ describe('Server', function() {
       const root = 'public';
       const expressSpy = sinon.spy(express, 'static');
 
-      server.serveStaticFiles();
+      server.serveStaticFiles(root);
 
       assert.ok(expressSpy.calledOnce);
       assert.strictEqual(root, expressSpy.getCall(0).args[0]);
