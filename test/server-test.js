@@ -187,5 +187,42 @@ describe('Server', function() {
             });
       });
     });
+
+    describe('Get quote by id', function() {
+      it('returns status code 200', function(done) {
+        request(server.app)
+            .get('/api/quotes/1')
+            .expect(200, done);
+      });
+
+      it('returns quote with passed in id', function(done) {
+        const id = 1;
+        request(server.app)
+            .get(`/api/quotes/${id}`)
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err);
+              const quote = res.body.quote;
+              assert.ok(quote.id !== undefined);
+              assert.ok(quote.quote !== undefined);
+              assert.ok(quote.person !== undefined);
+              done();
+            });
+      });
+
+      it('returns 404 when the id is not found', function(done) {
+        const id = 30;
+        request(server.app)
+            .get(`/api/quotes/${id}`)
+            .expect(404, done);
+      });
+
+      it('returns 400 when the id is not a number', function(done) {
+        const id = 'string';
+        request(server.app)
+            .get(`/api/quotes/${id}`)
+            .expect(400, done);
+      });
+    });
   });
 });

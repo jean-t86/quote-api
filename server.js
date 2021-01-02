@@ -1,5 +1,5 @@
 const {quotes} = require('./data.js');
-const {getRandomElement} = require('./utils.js');
+const {getRandomElement, getElementById} = require('./utils.js');
 
 /**
  * The Server class used to encapsulate the node.js web server
@@ -87,6 +87,19 @@ class Server {
       res.status(200).send({quotes});
     });
 
+    server.app.get('/api/quotes/:quoteId', (req, res) => {
+      const id = Number(req.params.quoteId);
+      if (id) {
+        const quote = getElementById(quotes, id);
+        if (quote) {
+          res.status(200).send({quote});
+        } else {
+          res.status(404).send();
+        }
+      } else {
+        res.status(400).send();
+      }
+    });
     server.listen(port, `Server listening on port ${port}`);
   }
 }
