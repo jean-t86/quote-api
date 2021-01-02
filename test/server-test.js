@@ -36,5 +36,16 @@ describe('Server', function() {
 
       appMock.verify();
     });
+
+    it('calls app.use with the correct middleware function', function() {
+      server.initialize();
+      const root = 'public';
+      const expressSpy = sinon.spy(express, 'static');
+
+      server.serveStaticFiles();
+
+      assert.ok(expressSpy.calledOnce);
+      assert.strictEqual(root, expressSpy.getCall(0).args[0]);
+    });
   });
 });
