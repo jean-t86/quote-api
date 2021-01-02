@@ -83,6 +83,10 @@ class Server {
       res.status(200).send({quote});
     });
 
+    server.app.get('/api/quotes', (req, res) => {
+      res.status(200).send({quotes});
+    });
+
     server.listen(port, `Server listening on port ${port}`);
   }
 }

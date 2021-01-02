@@ -146,24 +146,46 @@ describe('Server', function() {
       server.close(done);
     });
 
-    it('returns status code 200', function(done) {
-      request(server.app)
-          .get('/api/quotes/random')
-          .expect(200, done);
+    describe('GET random quote', function() {
+      it('returns status code 200', function(done) {
+        request(server.app)
+            .get('/api/quotes/random')
+            .expect(200, done);
+      });
+
+      it('returns a random quote', function(done) {
+        request(server.app)
+            .get('/api/quotes/random')
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err);
+              const quote = res.body.quote;
+              assert.ok(quote.id !== undefined);
+              assert.ok(quote.quote !== undefined);
+              assert.ok(quote.person !== undefined);
+              done();
+            });
+      });
     });
 
-    it('returns a random quote', function(done) {
-      request(server.app)
-          .get('/api/quotes/random')
-          .expect(200)
-          .end((err, res) => {
-            if (err) return done(err);
-            const quote = res.body.quote;
-            assert.ok(quote.id !== undefined);
-            assert.ok(quote.quote !== undefined);
-            assert.ok(quote.person !== undefined);
-            done();
-          });
+    describe('Get all quotes', function() {
+      it('returns status code 200', function(done) {
+        request(server.app)
+            .get('/api/quotes')
+            .expect(200, done);
+      });
+
+      it('returns all quotes', function(done) {
+        request(server.app)
+            .get('/api/quotes')
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err);
+              const quotes = res.body.quotes;
+              assert.ok(quotes.length > 0);
+              done();
+            });
+      });
     });
   });
 });
