@@ -98,12 +98,14 @@ class Server {
       res.status(200).send({quotes});
     });
 
-    server.app.get('/api/quotes/:quoteId', (req, res) => {
-      const id = Number(req.params.quoteId);
+    server.app.param('quoteId', (req, res, next, quoteId) => {
+      const id = Number(quoteId);
       if (id) {
         const quote = getElementById(quotes, id);
         if (quote) {
-          res.status(200).send({quote});
+          req.quoteId = id;
+          req.quote = {quote};
+          next();
         } else {
           res.status(404).send();
         }
@@ -112,22 +114,19 @@ class Server {
       }
     });
 
+    server.app.get('/api/quotes/:quoteId', (req, res) => {
+      res.status(200).send(req.quote);
+    });
+
     server.app.put('/api/quotes/:quoteId', (req, res) => {
-      const id = Number(req.params.quoteId);
-      if (id) {
-        const quote = getElementById(quotes, id);
-        if (quote) {
-          quote.quote = req.body.quote.quote;
-          quote.person = req.body.quote.person;
-          const index = getIndexById(quotes, id);
-          quotes[index] = quote;
-          res.status(200).send();
-        } else {
-          res.status(404).send();
-        }
-      } else {
-        res.status(400).send();
-      }
+      const quote = {
+        id: req.quoteId,
+        quote: req.body.quote.quote,
+        person: req.body.quote.person,
+      };
+      const index = getIndexById(quotes, req.quoteId);
+      quotes[index] = quote;
+      res.status(200).send({quote});
     });
 
     server.listen(port, `Server listening on port ${port}`);
