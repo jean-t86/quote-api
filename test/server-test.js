@@ -2,6 +2,7 @@ const {assert} = require('chai');
 const sinon = require('sinon');
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const request = require('supertest');
 
 const Server = require('../server.js');
@@ -20,77 +21,97 @@ describe('Server', function() {
 
   describe('Initialize app in constructor', function() {
     it('initialises the express app by calling express()', function() {
-      const expressSpy = sinon.spy();
-      server = new Server(expressSpy, morgan, console);
+      const spyExpress = sinon.spy();
+      server = new Server(spyExpress, morgan, console);
 
-      assert.ok(expressSpy.calledOnce);
+      assert.ok(spyExpress.calledOnce);
     });
   });
 
   describe('Serves static pages', function() {
     it('calls app.use to setup the static middleware', function() {
-      const appMock = sinon.mock(server.app);
-      appMock.expects('use').once();
+      const mockApp = sinon.mock(server.app);
+      mockApp.expects('use').once();
 
       server.serveStaticFiles('public');
 
-      appMock.verify();
+      mockApp.verify();
     });
 
     it('calls app.use with the correct middleware function', function() {
       const root = 'public';
-      const expressSpy = sinon.spy(express, 'static');
+      const spyExpress = sinon.spy(express, 'static');
 
       server.serveStaticFiles(root);
 
-      assert.ok(expressSpy.calledOnce);
-      assert.strictEqual(root, expressSpy.getCall(0).args[0]);
+      assert.ok(spyExpress.calledOnce);
+      assert.strictEqual(root, spyExpress.getCall(0).args[0]);
     });
   });
 
   describe('Uses morgan as console logger', function() {
     it('calls app.use to setup the morgan logger', function() {
-      const appMock = sinon.mock(server.app);
-      appMock.expects('use').once();
+      const mockApp = sinon.mock(server.app);
+      mockApp.expects('use').once();
 
       server.setupMorgan('combined');
 
-      appMock.verify();
+      mockApp.verify();
     });
 
     it('correctly sets up the morgan logger', function() {
-      const morganSpy = sinon.spy(morgan);
-      server = new Server(express, morganSpy, console);
+      const spyMorgan = sinon.spy(morgan);
+      server = new Server(express, spyMorgan, console);
       const format = 'combined';
 
       server.setupMorgan(format);
 
-      assert.ok(morganSpy.calledOnce);
-      assert.strictEqual(format, morganSpy.getCall(0).args[0]);
+      assert.ok(spyMorgan.calledOnce);
+      assert.strictEqual(format, spyMorgan.getCall(0).args[0]);
+    });
+  });
+
+  describe('Uses a json body parser', function() {
+    it('call app.use to use the middleware', function() {
+      const mockApp = sinon.mock(server.app);
+      mockApp.expects('use').once();
+
+      server.setupBodyParser(bodyParser.json);
+
+      mockApp.verify();
+    });
+
+    it('sets app to use body-parser.json', function() {
+      const spyBodyParser = sinon.spy(bodyParser.json);
+      server = new Server(express, morgan, console);
+
+      server.setupBodyParser(spyBodyParser);
+
+      assert.ok(spyBodyParser.calledOnce);
     });
   });
 
   describe('Listens on the correct port', function() {
     it('calls listen() with the correct port', function() {
-      const appSpy = sinon.spy(server.app, 'listen');
+      const spyApp = sinon.spy(server.app, 'listen');
       const port = 4001;
 
       const httpServer = server.listen(port, 'asda');
-      assert.ok(appSpy.calledOnce);
-      assert.strictEqual(port, appSpy.getCall(0).args[0]);
+      assert.ok(spyApp.calledOnce);
+      assert.strictEqual(port, spyApp.getCall(0).args[0]);
       httpServer.close();
     });
 
     it('logs a message to the console once listen() is called', function(done) {
-      const consoleSpy = sinon.spy(console, 'log');
+      const spyConsole = sinon.spy(console, 'log');
       const port = 4002;
       consoleMsg = `Server listening on port ${port}`;
 
       const httpServer = server.listen(port, consoleMsg);
 
       httpServer.on('listening', () => {
-        assert.ok(consoleSpy.calledOnce);
-        assert.strictEqual(consoleMsg, consoleSpy.getCall(0).args[0]);
+        assert.ok(spyConsole.calledOnce);
+        assert.strictEqual(consoleMsg, spyConsole.getCall(0).args[0]);
         httpServer.close();
         done();
       });
@@ -99,24 +120,24 @@ describe('Server', function() {
 
   describe('Runs the server', function() {
     it('executes calls to the server object in the right order', function() {
-      const serveStaticFiles = sinon.spy(server, 'serveStaticFiles');
-      const setupMorgan = sinon.spy(server, 'setupMorgan');
-      const listen = sinon.spy(server, 'listen');
+      const spyServeStaticFiles = sinon.spy(server, 'serveStaticFiles');
+      const spySetupMorgan = sinon.spy(server, 'setupMorgan');
+      const spyListen = sinon.spy(server, 'listen');
       const port = 4001;
 
       Server.run(server, port);
 
-      assert.ok(serveStaticFiles.calledOnce);
-      assert.strictEqual('public', serveStaticFiles.getCall(0).args[0]);
+      assert.ok(spyServeStaticFiles.calledOnce);
+      assert.strictEqual('public', spyServeStaticFiles.getCall(0).args[0]);
 
-      assert.ok(setupMorgan.calledAfter(serveStaticFiles));
-      assert.strictEqual('combined', setupMorgan.getCall(0).args[0]);
+      assert.ok(spySetupMorgan.calledAfter(spyServeStaticFiles));
+      assert.strictEqual('combined', spySetupMorgan.getCall(0).args[0]);
 
-      assert.ok(listen.calledAfter(setupMorgan));
-      assert.strictEqual(port, listen.getCall(0).args[0]);
+      assert.ok(spyListen.calledAfter(spySetupMorgan));
+      assert.strictEqual(port, spyListen.getCall(0).args[0]);
       assert.strictEqual(
           `Server listening on port ${port}`,
-          listen.getCall(0).args[1],
+          spyListen.getCall(0).args[1],
       );
     });
   });

@@ -1,5 +1,6 @@
 const {quotes} = require('./data.js');
-const {getRandomElement, getElementById} = require('./utils.js');
+const {getRandomElement, getElementById, getIndexById} = require('./utils.js');
+const bodyParser = require('body-parser');
 
 /**
  * The Server class used to encapsulate the node.js web server
@@ -42,6 +43,15 @@ class Server {
   }
 
   /**
+   * Setup the body parse to use for req.body
+   * @param {NextHandleFunction} bodyParser The parser to use to parse the
+   * req.body
+   */
+  setupBodyParser(bodyParser) {
+    this._app.use(bodyParser());
+  }
+
+  /**
    * Listens for incoming requests to the web server
    * @param {number} port The port number on which to listen
    * @param {logMsg} logMsg The message to log once the Server starts listening
@@ -77,6 +87,7 @@ class Server {
   static run(server, port) {
     server.serveStaticFiles('public');
     server.setupMorgan('combined');
+    server.setupBodyParser(bodyParser.json);
 
     server.app.get('/api/quotes/random', (req, res) => {
       const quote = getRandomElement(quotes);
