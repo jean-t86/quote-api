@@ -66,4 +66,16 @@ describe('Server', function() {
       assert.strictEqual(format, morganSpy.getCall(0).args[0]);
     });
   });
+
+  describe('Listens on the correct port', function() {
+    it('it listens on the correct port', function() {
+      const appMock = sinon.mock(server._app);
+      const port = 4001;
+      appMock.expects('listen').once().withArgs(port);
+
+      server.listen(port);
+
+      appMock.verify();
+    });
+  });
 });
