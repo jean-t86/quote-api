@@ -27,11 +27,14 @@ describe('Server', function() {
 
   describe('Serves static pages', function() {
     it('calls app.use to setup the static middleware', function() {
-      const appSpy = sinon.spy(server._app);
+      server.initialize();
+
+      const appMock = sinon.mock(server._app);
+      appMock.expects('use').once();
 
       server.serveStaticFiles();
 
-      assert.ok(appSpy.use.calledOnce);
+      appMock.verify();
     });
   });
 });

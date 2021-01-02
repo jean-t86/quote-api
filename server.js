@@ -16,6 +16,13 @@ class Server {
   initialize() {
     this._app = this._express();
   }
+
+  /**
+   * Instructs the Server to serve static files
+   */
+  serveStaticFiles() {
+    this._app.use();
+  }
 }
 
 module.exports = Server;
