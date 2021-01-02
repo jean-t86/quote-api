@@ -24,4 +24,14 @@ describe('Server', function() {
       assert.ok(expressSpy.calledOnce);
     });
   });
+
+  describe('Serves static pages', function() {
+    it('calls app.use to setup the static middleware', function() {
+      const appSpy = sinon.spy(server._app);
+
+      server.serveStaticFiles();
+
+      assert.ok(appSpy.use.calledOnce);
+    });
+  });
 });
