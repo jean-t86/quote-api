@@ -1,5 +1,5 @@
-const {getRandomElement, getElementById, getIndexById} = require('./utils.js');
 const bodyParser = require('body-parser');
+const quotesRouter = require('./quotes-router.js');
 
 /**
  * The Server class used to encapsulate the node.js web server
@@ -60,6 +60,15 @@ class Server {
   }
 
   /**
+   * Setup the quotes router
+   * @param {string} path The path of the route
+   * @param {function} router A function that returns the router
+   */
+  setupRouter(path, router) {
+    this._app.use(path, router(this._quotes));
+  }
+
+  /**
    * Listens for incoming requests to the web server
    * @param {number} port The port number on which to listen
    * @param {logMsg} logMsg The message to log once the Server starts listening
@@ -96,66 +105,7 @@ class Server {
     server.serveStaticFiles('public');
     server.setupMorgan('combined');
     server.setupBodyParser(bodyParser.json);
-
-    server.app.get('/api/quotes/random', (req, res) => {
-      const quote = getRandomElement(server.quotes);
-      res.status(200).send({quote});
-    });
-
-    server.app.get('/api/quotes', (req, res) => {
-      res.status(200).send({quotes: server.quotes});
-    });
-
-    server.app.param('quoteId', (req, res, next, quoteId) => {
-      const id = Number(quoteId);
-      if (id) {
-        const quote = getElementById(server.quotes, id);
-        if (quote) {
-          req.quoteId = id;
-          req.quote = {quote};
-          next();
-        } else {
-          res.status(404).send();
-        }
-      } else {
-        res.status(400).send();
-      }
-    });
-
-    server.app.get('/api/quotes/:quoteId', (req, res) => {
-      res.status(200).send(req.quote);
-    });
-
-    const validateQuote = (req, res, next) => {
-      const quote = req.body.quote;
-      if (quote.id && quote.quote && quote.person) {
-        next();
-      } else {
-        res.status(400).send();
-      }
-    };
-
-    server.app.put('/api/quotes/:quoteId', validateQuote, (req, res) => {
-      const quote = {
-        id: req.quoteId,
-        quote: req.body.quote.quote,
-        person: req.body.quote.person,
-      };
-      const index = getIndexById(server.quotes, req.quoteId);
-      server.quotes[index] = quote;
-      res.status(200).send({quote});
-    });
-
-    server.app.delete('/api/quotes/:quoteId', (req, res) => {
-      const index = getIndexById(server.quotes, req.quoteId);
-      const deleted = server.quotes.splice(index, 1);
-      if (deleted) {
-        res.status(204).send();
-      } else {
-        res.status(404).send();
-      }
-    });
-
+    server.setupRouter('/api/quotes', quotesRouter);
     server.listen(port, `Server listening on port ${port}`);
   }
 }
