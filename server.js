@@ -1,4 +1,3 @@
-const {quotes} = require('./data.js');
 const {getRandomElement, getElementById, getIndexById} = require('./utils.js');
 const bodyParser = require('body-parser');
 
@@ -11,11 +10,13 @@ class Server {
    * @param {express} express The express web framework
    * @param {morgan} morgan The morgan logger middleware
    * @param {console} console The console
+   * @param {array} quotes The array of quotes
    */
-  constructor(express, morgan, console) {
+  constructor(express, morgan, console, quotes) {
     this._express = express;
     this._morgan = morgan;
     this._console = console;
+    this._quotes = quotes;
     this._app = express();
   }
 
@@ -24,6 +25,13 @@ class Server {
    */
   get app() {
     return this._app;
+  }
+
+  /**
+   * Getter method for this._quotes
+   */
+  get quotes() {
+    return this._quotes;
   }
 
   /**
@@ -71,7 +79,7 @@ class Server {
    * otherwise
    */
   close(done) {
-    if (this._httpServer !== undefined) {
+    if (this._httpServer) {
       this._httpServer.close(done);
       return true;
     } else {
@@ -90,18 +98,18 @@ class Server {
     server.setupBodyParser(bodyParser.json);
 
     server.app.get('/api/quotes/random', (req, res) => {
-      const quote = getRandomElement(quotes);
+      const quote = getRandomElement(server.quotes);
       res.status(200).send({quote});
     });
 
     server.app.get('/api/quotes', (req, res) => {
-      res.status(200).send({quotes});
+      res.status(200).send({quotes: server.quotes});
     });
 
     server.app.param('quoteId', (req, res, next, quoteId) => {
       const id = Number(quoteId);
       if (id) {
-        const quote = getElementById(quotes, id);
+        const quote = getElementById(server.quotes, id);
         if (quote) {
           req.quoteId = id;
           req.quote = {quote};
@@ -133,9 +141,19 @@ class Server {
         quote: req.body.quote.quote,
         person: req.body.quote.person,
       };
-      const index = getIndexById(quotes, req.quoteId);
-      quotes[index] = quote;
+      const index = getIndexById(server.quotes, req.quoteId);
+      server.quotes[index] = quote;
       res.status(200).send({quote});
+    });
+
+    server.app.delete('/api/quotes/:quoteId', (req, res) => {
+      const index = getIndexById(server.quotes, req.quoteId);
+      const deleted = server.quotes.splice(index, 1);
+      if (deleted) {
+        res.status(204).send();
+      } else {
+        res.status(404).send();
+      }
     });
 
     server.listen(port, `Server listening on port ${port}`);

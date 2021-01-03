@@ -4,6 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const request = require('supertest');
+const {quotes} = require('../data.js');
 
 const Server = require('../server.js');
 
@@ -11,18 +12,17 @@ describe('Server', function() {
   let server;
 
   beforeEach(function() {
-    server = new Server(express, morgan, console);
+    server = new Server(express, morgan, console, [...quotes]);
   });
 
   afterEach(function() {
     sinon.restore();
-    server.close();
   });
 
   describe('Initialize app in constructor', function() {
     it('initialises the express app by calling express()', function() {
       const spyExpress = sinon.spy();
-      server = new Server(spyExpress, morgan, console);
+      server = new Server(spyExpress, morgan, console, quotes);
 
       assert.ok(spyExpress.calledOnce);
     });
@@ -61,7 +61,7 @@ describe('Server', function() {
 
     it('correctly sets up the morgan logger', function() {
       const spyMorgan = sinon.spy(morgan);
-      server = new Server(express, spyMorgan, console);
+      server = new Server(express, spyMorgan, console, quotes);
       const format = 'combined';
 
       server.setupMorgan(format);
@@ -83,7 +83,7 @@ describe('Server', function() {
 
     it('sets app to use body-parser.json', function() {
       const spyBodyParser = sinon.spy(bodyParser.json);
-      server = new Server(express, morgan, console);
+      server = new Server(express, morgan, console, quotes);
 
       server.setupBodyParser(spyBodyParser);
 
@@ -92,19 +92,19 @@ describe('Server', function() {
   });
 
   describe('Listens on the correct port', function() {
-    it('calls listen() with the correct port', function() {
+    it('calls listen() with the correct port', function(done) {
       const spyApp = sinon.spy(server.app, 'listen');
       const port = 4001;
 
       const httpServer = server.listen(port, 'asda');
       assert.ok(spyApp.calledOnce);
       assert.strictEqual(port, spyApp.getCall(0).args[0]);
-      httpServer.close();
+      httpServer.close(done);
     });
 
     it('logs a message to the console once listen() is called', function(done) {
       const spyConsole = sinon.spy(console, 'log');
-      const port = 4002;
+      const port = 4001;
       consoleMsg = `Server listening on port ${port}`;
 
       const httpServer = server.listen(port, consoleMsg);
@@ -112,14 +112,13 @@ describe('Server', function() {
       httpServer.on('listening', () => {
         assert.ok(spyConsole.calledOnce);
         assert.strictEqual(consoleMsg, spyConsole.getCall(0).args[0]);
-        httpServer.close();
-        done();
+        httpServer.close(done);
       });
     });
   });
 
   describe('Runs the server', function() {
-    it('executes calls to the server object in the right order', function() {
+    it('executes calls to the server in the right order', function(done) {
       const spyServeStaticFiles = sinon.spy(server, 'serveStaticFiles');
       const spySetupMorgan = sinon.spy(server, 'setupMorgan');
       const spySetupBodyParser = sinon.spy(server, 'setupBodyParser');
@@ -143,20 +142,23 @@ describe('Server', function() {
           `Server listening on port ${port}`,
           spyListen.getCall(0).args[1],
       );
+
+      server.close(done);
     });
   });
 
   describe('Closes the server connection', function() {
-    it('close() returns false if server is not listening', function() {
-      const isClosed = server.close();
+    it('close() returns false if server is not listening', function(done) {
+      const isClosed = server.close(done);
+      if (!isClosed) done();
 
       assert.ok(!isClosed);
     });
 
-    it('close() returns true if the server was listening', function() {
+    it('close() returns true if the server was listening', function(done) {
       server.listen(4001, '');
 
-      const isClosed = server.close();
+      const isClosed = server.close(done);
 
       assert.ok(isClosed);
     });
@@ -164,6 +166,7 @@ describe('Server', function() {
 
   describe('Quote API', function() {
     beforeEach(function() {
+      server = new Server(express, morgan, console, [...quotes]);
       Server.run(server, 4001);
     });
 
@@ -266,7 +269,7 @@ describe('Server', function() {
 
       it('updates an existing quote', async function() {
         // Get a random quote and update it
-        const response = await request(server.app)
+        await request(server.app)
             .get('/api/quotes/random');
         const id = response.body.quote.id;
         const quote = {
@@ -318,6 +321,31 @@ describe('Server', function() {
               },
             })
             .expect(400, done);
+      });
+    });
+
+    describe('Delete a quote', function() {
+      it('returns status code 200', function(done) {
+        request(server.app)
+            .delete('/api/quotes/2')
+            .expect(204, done);
+      });
+
+      it('returns 404 if quote is not found', function(done) {
+        request(server.app)
+            .delete('/api/quotes/21')
+            .expect(404, done);
+      });
+
+      it('removes the deleted quote', async function() {
+        const id = 2;
+        await request(server.app)
+            .delete(`/api/quotes/${id}`)
+            .expect(204);
+
+        await request(server.app)
+            .get(`/api/quotes/${id}`)
+            .expect(404);
       });
     });
   });
